@@ -9,17 +9,10 @@ from torchvision import transforms
 import torch.optim.lr_scheduler as lr_scheduler
 from DataSet_2 import MaxMinNormalizeGlobalPerChannel,MyDataSet, dataset_2
 from train_and_eval import train_one_epoch, evaluate, MixedMSE
-
-# from model_1 import CNN_1, CNNwithSEBlock_1, CNNwithRowSelfAttention_1
-# from model_2 import CNN_2, CNNwithSEBlock_2, CNNwithRowSelfAttention_2
-# from model_3 import CNN_3, CNNwithSEBlock_3, CNNwithRowSelfAttention_3
-# from model_4 import CNN_4, CNNwithSEBlock_4, CNNwithRowSelfAttention_4
-# from model_5 import CNN_5, CNNwithSEBlock_5, CNNwithRowSelfAttention_5
-# from MB_model import MB_ThreeBranch, MB_ThreeBranch_v2
-# from MB_Attn import MB_ThreeBranch_v2_Attn_v4
-# from Tri_Gated import TriFusionTGFNet, TriFusionCBAMNet, TriFusionConcatNet, TriFusionD3DNet,TriFusionGumbelNet,TriFusionSENet,TriFusionSKNet
-# from deepset import DSReconstruction
-from GNN import GraphReconstruction
+from CNN import CNN, CNNwithSEBlock, CNNwithRowSelfAttention
+from MB_model import MB_ThreeBranch, MB_ThreeBranch_v2
+from deepset import DSReconstruction
+from GNN import DGCNNModel
 
 random.seed(26)
 np.random.seed(26)
@@ -33,8 +26,13 @@ os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"  # 或者 ":4096:8"
 
 
 model_dict = {
-    # 'deepset': DSReconstruction,
-    'gnn': GraphReconstruction
+    'cnn': CNN,
+    'cnn_se': CNNwithSEBlock,
+    'cnn_row_attn': CNNwithRowSelfAttention,
+    'deepset': DSReconstruction,
+    'gnn': DGCNNModel,
+    'MB_ThreeBranch': MB_ThreeBranch,
+    'MB_ThreeBranch_v2': MB_ThreeBranch_v2
 }
 
 
@@ -183,32 +181,13 @@ def main(args):
     all_results = []
     # 为v2和v3版本模型设置更小的batch size
     model_batch_sizes = {
-        'deepset': 8,
-        # 'CNN_1': 200,
-        # 'CNNwithSEBlock_1': 200,
-        # 'CNNwithRowSelfAttention_1': 200,
-        # 'CNN_2': 200,
-        # 'CNNwithSEBlock_2': 200,
-        # 'CNNwithRowSelfAttention_2': 200,
-        # 'CNN_3': 200,
-        # 'CNNwithSEBlock_3': 200,
-        # 'CNNwithRowSelfAttention_3': 200,
-        # 'CNN_4': 128,
-        # 'CNNwithSEBlock_4': 128,
-        # 'CNNwithRowSelfAttention_4': 128,
-        # 'CNN_5': 80,
-        # 'CNNwithSEBlock_5': 80,
-        # 'CNNwithRowSelfAttention_5': 80,
-        # 'MB_ThreeBranch': 200,
-        # 'MB_ThreeBranch_v2': 128,
-        # 'MB_ThreeBranch_v2_Attn_v4': 10,
-        # 'TriFusionTGFNet': 128,
-        # 'TriFusionCBAMNet': 128,
-        # 'TriFusionConcatNet': 128,
-        # 'TriFusionD3DNet': 128,
-        # 'TriFusionGumbelNet': 128,
-        # 'TriFusionSENet': 128,
-        # 'TriFusionSKNet': 128,
+        'CNN':128,
+        'CNNwithSEBlock': 128,
+        'CNNwithRowSelfAttention': 80,
+        'deepset': 256,
+        'gnn': 8,
+        'MB_ThreeBranch': 200,
+        'MB_ThreeBranch_v2': 128,
     }
     
     # 训练每个模型并记录结果
