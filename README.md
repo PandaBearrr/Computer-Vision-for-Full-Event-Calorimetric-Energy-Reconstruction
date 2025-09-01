@@ -4,3 +4,5 @@ Official PyTorch repo for full-event calorimetric energy reconstruction. Include
 The code has not yet been uploaded—stay tuned.
 
 2025/08/27 Upload part of the code, not fully updated yet
+
+2025/09/01 Update complete
